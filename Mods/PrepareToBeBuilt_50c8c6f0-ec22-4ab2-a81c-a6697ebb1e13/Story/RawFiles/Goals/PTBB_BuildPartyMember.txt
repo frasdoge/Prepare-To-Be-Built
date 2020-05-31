@@ -1,0 +1,102 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+
+// All talents in the base game, taken from JLMBYpp to ensure anything made compatible with that is also with this
+DB_JLMBYpp_AllTalents("Ambidextrous"); // Ambidextrous
+DB_JLMBYpp_AllTalents("RangerLoreArrowRecover"); // Arrow Recovery
+DB_JLMBYpp_AllTalents("ResistDead"); // Comeback Kid
+DB_JLMBYpp_AllTalents("ElementalAffinity"); // Elemental Affinity
+DB_JLMBYpp_AllTalents("ElementalRanger"); // Elemental Ranger
+DB_JLMBYpp_AllTalents("Escapist"); // Escapist
+DB_JLMBYpp_AllTalents("Executioner"); // Executioner
+DB_JLMBYpp_AllTalents("FaroutDude"); // Far Out Man
+DB_JLMBYpp_AllTalents("FiveStarRestaurant"); // Five-Star Diner
+DB_JLMBYpp_AllTalents("Raistlin"); // Glass Cannon
+DB_JLMBYpp_AllTalents("SurpriseAttack"); // Guerilla
+DB_JLMBYpp_AllTalents("Perfectionist"); // Hothead
+DB_JLMBYpp_AllTalents("IceKing"); // Ice King
+DB_JLMBYpp_AllTalents("Leech"); // Leech
+DB_JLMBYpp_AllTalents("LivingArmor"); // Living Armour
+DB_JLMBYpp_AllTalents("LoneWolf"); // Lone Wolf
+DB_JLMBYpp_AllTalents("Memory"); // Mnemonic
+DB_JLMBYpp_AllTalents("ResurrectToFullHealth"); // Morning Person
+DB_JLMBYpp_AllTalents("AttackOfOpportunity"); // Opportunist
+DB_JLMBYpp_AllTalents("DualWieldingDodging"); // Parry Master
+DB_JLMBYpp_AllTalents("AnimalEmpathy"); // Pet Pal
+DB_JLMBYpp_AllTalents("WarriorLoreNaturalHealth"); // Picture of Health
+DB_JLMBYpp_AllTalents("ViolentMagic"); // Savage Sortilege
+DB_JLMBYpp_AllTalents("WarriorLoreGrenadeRange"); // Slingshost
+DB_JLMBYpp_AllTalents("Stench"); // Stench
+DB_JLMBYpp_AllTalents("QuickStep"); // The Pawn
+DB_JLMBYpp_AllTalents("Torturer"); // Torturer
+DB_JLMBYpp_AllTalents("Unstable"); // Unstable
+DB_JLMBYpp_AllTalents("WalkItOff"); // Walk It Off
+DB_JLMBYpp_AllTalents("WhatARush"); // What A Rush
+DB_JLMBYpp_AllTalents("ExtraSkillPoints"); // All Skilled Up
+DB_JLMBYpp_AllTalents("ExtraStatPoints"); // Bigger And Better
+DB_JLMBYpp_AllTalents("Demon"); // Demon
+DB_JLMBYpp_AllTalents("NoAttackOfOpportunity"); // Duck Duck Goose
+
+KBSECTION
+
+// Heavily stripped down version of JLMBYpp
+// Minimal changes to code except where necessary to ensure that things made compatible with JLMBYpp are also compatible with this
+
+IF
+GameStarted(_Region, _)
+AND
+SysStatus("LaughingLeader_InnateTalents", _Status)
+THEN
+DB_JLMBYpp_InnateTalents("AnimalEmpathy");
+DB_JLMBYpp_InnateTalents("ViolentMagic");
+DB_JLMBYpp_InnateTalents("QuickStep");
+
+IF
+GameStarted(_Region, _)
+AND
+SysStatus("KCE_Talents_Story", _Status)
+THEN
+DB_JLMBYpp_InnateTalents("AttackOfOpportunity");
+DB_JLMBYpp_InnateTalents("ViolentMagic");
+DB_JLMBYpp_InnateTalents("QuickStep");
+
+IF
+CharacterJoinedParty((CHARACTERGUID)_Char)
+AND
+DB_IsPlayer(_Char)
+AND
+NOT DB_PTBB_HasBuilt(_Char)
+THEN
+DB_PTBB_HasBuilt(_Char);
+PTBB_Rebuild(_Char);
+
+PROC
+PTBB_Rebuild((CHARACTERGUID)_Char)
+THEN
+PTBB_RefundTalents(_Char); // Compatibility with mods like Auspicious Beginnings that overwrite classes
+
+PROC
+PTBB_Rebuild((CHARACTERGUID)_Char)
+AND
+CharacterAddToCharacterCreation(_Char, 1, 1)
+THEN
+DB_NOOP();
+
+//
+PROC
+PTBB_RefundTalents((CHARACTERGUID)_Char)
+AND
+DB_JLMBYpp_AllTalents(_Talent)
+AND
+NOT DB_JLMBYpp_InnateTalents(_Talent)
+AND
+CharacterHasTalent(_Char, _Talent, 1)
+THEN
+CharacterRemoveTalent(_Char, _Talent);
+CharacterAddTalentPoint(_Char, 1);
+
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "__Start"
